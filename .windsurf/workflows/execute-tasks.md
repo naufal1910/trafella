@@ -39,7 +39,7 @@ steps:
     title: "🔁 Loop Through All Tasks"
     type: loop
     source: |
-      Parse `tasks.md` from `.agent-os/specs/{{spec_folder}}/`
+      Parse `tasks.md` from `.document/specs/{{spec_folder}}/`
       Identify all uncompleted parent tasks (e.g., 1, 2, 3)
     steps:
       - use_workflow: execute-task
@@ -80,7 +80,7 @@ steps:
     title: "📌 Mark Feature as Completed in Roadmap"
     type: action
     action: |
-      In `.agent-os/product/roadmap.md`, locate the feature implemented by this spec and:
+      In `.document/product/roadmap.md`, locate the feature implemented by this spec and:
       - Mark as complete `[x]`
       - Add a note if needed about scope or outcome
 

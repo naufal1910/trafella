@@ -81,11 +81,11 @@ steps:
     type: action
     action: |
       Create the following files:
-      - `.agent-os/product/mission.md`
-      - `.agent-os/product/mission-lite.md`
-      - `.agent-os/product/tech-stack.md`
-      - `.agent-os/product/roadmap.md`
-      - `.agent-os/product/decisions.md`
+      - `.document/product/mission.md`
+      - `.document/product/mission-lite.md`
+      - `.document/product/tech-stack.md`
+      - `.document/product/roadmap.md`
+      - `.document/product/decisions.md`
       
       Each file should include structured content using the fields collected above.
 

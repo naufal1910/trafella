@@ -37,6 +37,7 @@ steps:
         type: paragraph
 
   - id: clarify_scope
+    if: true
     title: "🔍 Clarify Scope & Details"
     type: form
     fields:
@@ -78,9 +79,9 @@ steps:
     type: action
     action: |
       Create the following files:
-      - `.agent-os/specs/YYYY-MM-DD-{{spec_title_kebab}}/spec.md`
-      - `.agent-os/specs/YYYY-MM-DD-{{spec_title_kebab}}/spec-lite.md`
-      - `.agent-os/specs/YYYY-MM-DD-{{spec_title_kebab}}/sub-specs/technical-spec.md`
+      - `.document/specs/YYYY-MM-DD-{{spec_title_kebab}}/spec.md`
+      - `.document/specs/YYYY-MM-DD-{{spec_title_kebab}}/spec-lite.md`
+      - `.document/specs/YYYY-MM-DD-{{spec_title_kebab}}/sub-specs/technical-spec.md`
       
       Conditionally create:
       - `database-schema.md` if DB changes needed
@@ -91,7 +92,7 @@ steps:
     type: summary
     content: |
       You're about to create a feature spec with:
-      - Title: {{spec_title}}
+      - Title: {{spec_title || roadmap_feature}}
       - Goal: {{feature_goals}}
       - Scope: {{in_scope.join(', ')}}
       - Out of Scope: {{out_of_scope.join(', ') || 'N/A'}}

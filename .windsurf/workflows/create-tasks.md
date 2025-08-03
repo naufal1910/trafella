@@ -63,7 +63,7 @@ steps:
     title: "📁 Generate `tasks.md`"
     type: action
     action: |
-      For the spec at `.agent-os/specs/{{spec_folder}}/`, generate `tasks.md` with:
+      For the spec at `.document/specs/{{spec_folder}}/`, generate `tasks.md` with:
 
       - Numbered major tasks
       - Subtasks with decimal format (e.g., 1.1, 1.2)

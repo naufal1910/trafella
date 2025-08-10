@@ -33,30 +33,30 @@ function onSubmit() {
 <template>
   <form @submit.prevent="onSubmit" class="space-y-4 bg-white/50 rounded-lg p-4 shadow">
     <div>
-      <label class="block text-sm font-medium mb-1">Destination</label>
-      <input v-model="destination" type="text" class="w-full border rounded px-3 py-2" placeholder="e.g., Paris" />
+      <label for="destination" class="block text-sm font-medium mb-1">Destination</label>
+      <input id="destination" v-model="destination" type="text" class="w-full border rounded px-3 py-2" placeholder="e.g., Paris" />
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <div>
-        <label class="block text-sm font-medium mb-1">Start Date</label>
-        <input v-model="startDate" type="date" class="w-full border rounded px-3 py-2" />
+        <label for="start-date" class="block text-sm font-medium mb-1">Start Date</label>
+        <input id="start-date" v-model="startDate" type="date" class="w-full border rounded px-3 py-2" />
       </div>
       <div>
-        <label class="block text-sm font-medium mb-1">End Date</label>
-        <input v-model="endDate" type="date" class="w-full border rounded px-3 py-2" />
+        <label for="end-date" class="block text-sm font-medium mb-1">End Date</label>
+        <input id="end-date" v-model="endDate" type="date" class="w-full border rounded px-3 py-2" />
       </div>
     </div>
 
     <div>
-      <label class="block text-sm font-medium mb-1">Interests (comma-separated)</label>
-      <input v-model="interestsInput" type="text" class="w-full border rounded px-3 py-2" placeholder="art, food, culture" />
+      <label for="interests" class="block text-sm font-medium mb-1">Interests (comma-separated)</label>
+      <input id="interests" v-model="interestsInput" type="text" class="w-full border rounded px-3 py-2" placeholder="art, food, culture" />
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <div>
-        <label class="block text-sm font-medium mb-1">Budget</label>
-        <select v-model="budget" class="w-full border rounded px-3 py-2">
+        <label for="budget" class="block text-sm font-medium mb-1">Budget</label>
+        <select id="budget" v-model="budget" class="w-full border rounded px-3 py-2">
           <option value="">No preference</option>
           <option value="low">Low</option>
           <option value="medium">Medium</option>
@@ -64,8 +64,8 @@ function onSubmit() {
         </select>
       </div>
       <div>
-        <label class="block text-sm font-medium mb-1">Party Size</label>
-        <input v-model.number="partySize" min="1" type="number" class="w-full border rounded px-3 py-2" />
+        <label for="party-size" class="block text-sm font-medium mb-1">Party Size</label>
+        <input id="party-size" v-model.number="partySize" min="1" type="number" class="w-full border rounded px-3 py-2" />
       </div>
     </div>
 

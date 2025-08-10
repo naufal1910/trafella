@@ -43,5 +43,5 @@ This file breaks down the work required to build the MVP, based on the approved 
 - [x] **3.3** Implement the live API call in the Pinia store.
 - [x] **3.4** Add basic telemetry hooks for logging and monitoring.
 - [x] **3.5** Create deployment configurations (`Dockerfile`, `vercel.json`).
-- [x] **3.6** Deploy the application to a staging environment (Vercel/Fly.io).
-- [x] **3.7** Verify the end-to-end flow on the live staging URL.
+- [ ] **3.6** Deploy the application to a staging environment (Vercel/Fly.io).
+- [ ] **3.7** Verify the end-to-end flow on the live staging URL.

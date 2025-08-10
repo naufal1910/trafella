@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import * as Sentry from '@sentry/vue'
 
 export interface ItineraryRequest {
   destination: string
@@ -41,13 +42,43 @@ export const useItineraryStore = defineStore('itinerary', () => {
     error.value = null
     
     try {
-      const response = await fetch('http://localhost:8000/api/v1/generate-itinerary', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(request),
-      })
+      const response = await (typeof (Sentry as any).startSpan === 'function'
+        ? (Sentry as any).startSpan(
+            {
+              name: 'generateItinerary',
+              op: 'http.client',
+              attributes: {
+                'http.method': 'POST',
+                'http.url': '/api/v1/generate-itinerary',
+              },
+            },
+            async () => {
+              const res = await fetch('http://localhost:8000/api/v1/generate-itinerary', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(request),
+              })
+              // Set status on the active span if available
+              try {
+                // @ts-ignore - Sentry types may not expose getActiveSpan in all builds
+                const span = Sentry.getActiveSpan && Sentry.getActiveSpan()
+                if (span) {
+                  // @ts-ignore
+                  span.setAttribute && span.setAttribute('http.status_code', res.status)
+                }
+              } catch {}
+              return res
+            }
+          )
+        : fetch('http://localhost:8000/api/v1/generate-itinerary', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(request),
+          }))
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)

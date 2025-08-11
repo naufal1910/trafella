@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "trafella-api"
+version = "0.1.0"
+description = "API for Trafella, the AI-powered itinerary generator."
+authors = ["Naufal <naufal.ihsan.1910@gmail.com>"]
+readme = "README.md"
+packages = [{include = "app"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.111.0"
+uvicorn = {extras = ["standard"], version = "^0.29.0"}
+pydantic = "^2.7.1"
+openai = "^1.30.1"
+python-dotenv = "^1.0.1"
+httpx = "^0.27.0"
+orjson = "^3.10.3"
+jinja2 = "^3.1.4"
+sentry-sdk = {extras = ["fastapi"], version = "^2.8.0"}
+prometheus-fastapi-instrumentator = "^7.0.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2.0"
+pytest-asyncio = "^0.23.6"
+black = "^24.4.2"
+ruff = "^0.4.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -129,6 +129,30 @@ export const useItineraryStore = defineStore('itinerary', () => {
     }
   }
 
+  function updateDay(dayNumber: number, patch: Partial<DayPlan>) {
+    if (!itinerary.value) return
+    const current = itinerary.value
+    const updatedDays = current.itinerary.days.map((d) => {
+      if (d.day_number !== dayNumber) return d
+      const nextActivities = {
+        ...d.activities,
+        ...(patch.activities ?? {}),
+      }
+      return {
+        ...d,
+        ...patch,
+        activities: nextActivities,
+      }
+    })
+    itinerary.value = {
+      ...current,
+      itinerary: {
+        ...current.itinerary,
+        days: updatedDays,
+      },
+    }
+  }
+
   function clearItinerary() {
     itinerary.value = null
     error.value = null
@@ -139,6 +163,7 @@ export const useItineraryStore = defineStore('itinerary', () => {
     loading,
     error,
     generateItinerary,
+    updateDay,
     clearItinerary,
   }
 })

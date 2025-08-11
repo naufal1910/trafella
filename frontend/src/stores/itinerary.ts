@@ -40,6 +40,7 @@ export const useItineraryStore = defineStore('itinerary', () => {
   async function generateItinerary(request: ItineraryRequest) {
     loading.value = true
     error.value = null
+    const baseUrl = (import.meta as any).env?.VITE_API_BASE_URL || window.location.origin
     
     try {
       const response = await (typeof (Sentry as any).startSpan === 'function'
@@ -53,7 +54,7 @@ export const useItineraryStore = defineStore('itinerary', () => {
               },
             },
             async () => {
-              const res = await fetch('http://localhost:8000/api/v1/generate-itinerary', {
+              const res = await fetch(`${baseUrl}/api/v1/generate-itinerary`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
@@ -72,7 +73,7 @@ export const useItineraryStore = defineStore('itinerary', () => {
               return res
             }
           )
-        : fetch('http://localhost:8000/api/v1/generate-itinerary', {
+        : fetch(`${baseUrl}/api/v1/generate-itinerary`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

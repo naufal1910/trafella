@@ -1,11 +1,18 @@
-# syntax=docker/dockerfile:1
-FROM python:3.11-slim
+FROM python:3.11-slim-bullseye
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1
 
 WORKDIR /app
+
+# Install system dependencies (build tools, CA certs)
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        build-essential \
+        curl \
+        ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install runtime dependencies
 COPY requirements.txt ./

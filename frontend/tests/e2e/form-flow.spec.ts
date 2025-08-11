@@ -79,7 +79,17 @@ test('submits itinerary form and shows results', async ({ page }) => {
     )
     // Be flexible on assertions for live content (titles vary). Verify header and day headings.
     await expect(page.getByText(/Itinerary for Paris/i)).toBeVisible({ timeout: 60_000 })
-    await expect(page.getByRole('heading', { name: /Day 1/i })).toBeVisible({ timeout: 60_000 })
-    await expect(page.getByRole('heading', { name: /Day 2/i })).toBeVisible({ timeout: 60_000 })
+    const dayHeadings = page.getByRole('heading', { name: /Day \d+/i })
+    const count = await dayHeadings.count()
+    expect(count).toBeGreaterThanOrEqual(2)
+
+    const day1Heading = page.getByRole('heading', { name: /Day 1/i })
+    await expect(day1Heading).toBeVisible({ timeout: 60_000 })
+    // Scope checks within the Day 1 card
+    const day1Card = day1Heading.locator('xpath=..')
+    await expect(day1Card.getByText(/\d{4}-\d{2}-\d{2}/)).toBeVisible({ timeout: 60_000 })
+    await expect(day1Card.getByText('Morning:')).toBeVisible({ timeout: 60_000 })
+    await expect(day1Card.getByText('Afternoon:')).toBeVisible({ timeout: 60_000 })
+    await expect(day1Card.getByText('Evening:')).toBeVisible({ timeout: 60_000 })
   }
 })

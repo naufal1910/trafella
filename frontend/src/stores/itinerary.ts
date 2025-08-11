@@ -37,6 +37,41 @@ export const useItineraryStore = defineStore('itinerary', () => {
   const loading = ref(false)
   const error = ref<string | null>(null)
 
+  function daysDiff(start: string, end: string) {
+    try {
+      const s = new Date(start)
+      const e = new Date(end)
+      const ms = e.getTime() - s.getTime()
+      const d = Math.round(ms / (1000 * 60 * 60 * 24)) + 1
+      return isFinite(d) && d > 0 ? d : 1
+    } catch {
+      return 1
+    }
+  }
+
+  function normalizeResponse(data: any, request: ItineraryRequest): ItineraryResponse {
+    // Accept multiple shapes from the backend and normalize to { itinerary: { days: [] } }
+    let days: DayPlan[] = []
+    if (Array.isArray(data?.itinerary?.days)) {
+      days = data.itinerary.days
+    } else if (Array.isArray(data?.itinerary)) {
+      days = data.itinerary
+    } else if (Array.isArray(data?.days)) {
+      days = data.days
+    } else if (Array.isArray(data?.itinerary?.itinerary?.days)) {
+      days = data.itinerary.itinerary.days
+    }
+
+    const destination = data?.destination ?? request.destination
+    const duration_days = Number(data?.duration_days) || days.length || daysDiff(request.start_date, request.end_date)
+
+    return {
+      destination,
+      duration_days,
+      itinerary: { days },
+    }
+  }
+
   async function generateItinerary(request: ItineraryRequest) {
     loading.value = true
     error.value = null
@@ -86,7 +121,7 @@ export const useItineraryStore = defineStore('itinerary', () => {
       }
 
       const data = await response.json()
-      itinerary.value = data
+      itinerary.value = normalizeResponse(data, request)
     } catch (e) {
       error.value = e instanceof Error ? e.message : 'An error occurred'
     } finally {

@@ -1,5 +1,8 @@
 import { test, expect } from '@playwright/test'
 
+// Allow more time for live API (LLM) responses when mocks are disabled
+test.setTimeout(120_000)
+
 // Basic end-to-end test for form submission and result display.
 // It stubs the backend API response so the test can run without the backend.
 
@@ -64,7 +67,19 @@ test('submits itinerary form and shows results', async ({ page }) => {
   await page.getByRole('button', { name: 'Generate Itinerary' }).click()
 
   // Assert results appear
-  await expect(page.getByText('Itinerary for Paris (2 days)')).toBeVisible()
-  await expect(page.getByText('Day 1 — Arrival and Louvre')).toBeVisible()
-  await expect(page.getByText('Day 2 — Eiffel Tower and Montmartre')).toBeVisible()
+  if (useMocks) {
+    await expect(page.getByText('Itinerary for Paris (2 days)')).toBeVisible()
+    await expect(page.getByText('Day 1 — Arrival and Louvre')).toBeVisible()
+    await expect(page.getByText('Day 2 — Eiffel Tower and Montmartre')).toBeVisible()
+  } else {
+    // Wait for live backend call to complete and render
+    await page.waitForResponse(
+      (resp) => resp.url().includes('/api/v1/generate-itinerary') && resp.ok(),
+      { timeout: 60_000 }
+    )
+    // Be flexible on assertions for live content (titles vary). Verify header and day headings.
+    await expect(page.getByText(/Itinerary for Paris/i)).toBeVisible({ timeout: 60_000 })
+    await expect(page.getByRole('heading', { name: /Day 1/i })).toBeVisible({ timeout: 60_000 })
+    await expect(page.getByRole('heading', { name: /Day 2/i })).toBeVisible({ timeout: 60_000 })
+  }
 })

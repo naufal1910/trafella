@@ -24,6 +24,12 @@ export interface DayPlan {
   tips?: string
 }
 
+export type DaySlot = 'morning' | 'afternoon' | 'evening'
+export interface DayItem {
+  id: DaySlot
+  label: string
+}
+
 export interface ItineraryResponse {
   destination: string
   duration_days: number
@@ -216,6 +222,71 @@ export const useItineraryStore = defineStore('itinerary', () => {
     saveToStorage()
   }
 
+  // --- Phase 2 Planner (M1) helpers ---
+  function dayToItems(day: DayPlan): DayItem[] {
+    const entries: Array<[DaySlot, string]> = [
+      ['morning', day.activities.morning],
+      ['afternoon', day.activities.afternoon],
+      ['evening', day.activities.evening],
+    ]
+    return entries
+      .filter(([, label]) => typeof label === 'string' && label.trim().length > 0)
+      .map(([slot, label]) => ({ id: slot, label }))
+  }
+
+  function getDayItems(dayNumber: number): DayItem[] {
+    const d = itinerary.value?.itinerary?.days.find((x) => x.day_number === dayNumber)
+    return d ? dayToItems(d) : []
+  }
+
+  function reorderActivity(dayNumber: number, fromIndex: number, toIndex: number) {
+    if (!itinerary.value) return
+    const day = itinerary.value.itinerary.days.find((d) => d.day_number === dayNumber)
+    if (!day) return
+    const items = dayToItems(day)
+    if (
+      fromIndex == null ||
+      toIndex == null ||
+      fromIndex === toIndex ||
+      fromIndex < 0 ||
+      toIndex < 0 ||
+      fromIndex >= items.length ||
+      toIndex >= items.length
+    ) {
+      return
+    }
+    const [moved] = items.splice(fromIndex, 1)
+    items.splice(toIndex, 0, moved)
+
+    // Map back to morning/afternoon/evening in the new sequential order
+    const nextActs = {
+      morning: items[0]?.label ?? '',
+      afternoon: items[1]?.label ?? '',
+      evening: items[2]?.label ?? '',
+    }
+    updateDay(dayNumber, { activities: nextActs as any })
+    try {
+      Sentry.addBreadcrumb?.({
+        category: 'planner:reorder',
+        type: 'user',
+        level: 'info',
+        message: 'reordered',
+        data: { dayNumber, fromIndex, toIndex, itemId: moved?.id },
+      })
+    } catch {}
+  }
+
+  function moveItemUp(dayNumber: number, index: number) {
+    if (index <= 0) return
+    reorderActivity(dayNumber, index, index - 1)
+  }
+
+  function moveItemDown(dayNumber: number, index: number) {
+    const len = getDayItems(dayNumber).length
+    if (index >= len - 1) return
+    reorderActivity(dayNumber, index, index + 1)
+  }
+
   function resetEdits() {
     if (!originalItinerary.value) return
     itinerary.value = deepClone(originalItinerary.value)
@@ -250,5 +321,10 @@ export const useItineraryStore = defineStore('itinerary', () => {
     clearItinerary,
     hasOriginal,
     loadFromStorage,
+    // Planner (M1)
+    getDayItems,
+    reorderActivity,
+    moveItemUp,
+    moveItemDown,
   }
 })

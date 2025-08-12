@@ -1,9 +1,16 @@
 # Trafella: High-Level Product Roadmap
 
+## Status (2025-08-12)
+
+- MVP shipped to staging.
+- Frontend (staging): https://trafella.vercel.app/
+- Backend API (staging): https://trafella-api-staging.fly.dev
+
 ## Phase 1: Minimum Viable Product (MVP)
 
 *   **Core Functionality**: AI-Powered Itinerary Generator for a single destination.
-*   **Interactivity**: Basic day-plan view with manual time adjustments.
+*   **Interactivity**: Basic day-plan view.
+    *   Note: Manual time adjustments are deferred to Phase 2.
 *   **Technology**: Implement core FastAPI backend and Vue.js frontend.
 *   **Goal**: Validate the core value proposition of AI-driven travel planning.
 

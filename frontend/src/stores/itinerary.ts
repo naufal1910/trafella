@@ -301,6 +301,25 @@ export const useItineraryStore = defineStore('itinerary', () => {
     saveToStorage()
   }
 
+  // Explicit confirm for Planner (M1) — persists current itinerary to local storage
+  function commitPlannerChanges() {
+    try {
+      Sentry.addBreadcrumb?.({
+        category: 'planner:confirm',
+        type: 'user',
+        level: 'info',
+        message: 'confirmChanges',
+      })
+    } catch {}
+    // All edits already call saveToStorage via updateDay, but this provides an explicit action
+    saveToStorage()
+    // communicate back to Home whether anything changed
+    try {
+      const changed = dirty.value
+      sessionStorage.setItem('planner_return', changed ? 'changed' : 'unchanged')
+    } catch {}
+  }
+
   function clearItinerary() {
     itinerary.value = null
     originalItinerary.value = null
@@ -309,6 +328,14 @@ export const useItineraryStore = defineStore('itinerary', () => {
   }
 
   const hasOriginal = computed(() => !!originalItinerary.value)
+  const dirty = computed(() => {
+    if (!itinerary.value || !originalItinerary.value) return false
+    try {
+      return JSON.stringify(itinerary.value) !== JSON.stringify(originalItinerary.value)
+    } catch {
+      return false
+    }
+  })
 
   return {
     itinerary,
@@ -318,8 +345,10 @@ export const useItineraryStore = defineStore('itinerary', () => {
     generateItinerary,
     updateDay,
     resetEdits,
+    commitPlannerChanges,
     clearItinerary,
     hasOriginal,
+    dirty,
     loadFromStorage,
     // Planner (M1)
     getDayItems,

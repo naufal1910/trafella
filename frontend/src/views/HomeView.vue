@@ -9,14 +9,24 @@ const restored = { value: false }
 const plannerEnabled = ((import.meta.env.VITE_PLANNER_ENABLED ?? '').toString().toLowerCase() === 'true')
 onMounted(() => {
   restored.value = store.loadFromStorage()
-  if (restored.value) {
+  let flag: string | null = null
+  try {
+    flag = sessionStorage.getItem('planner_return')
+    if (flag) sessionStorage.removeItem('planner_return')
+  } catch {}
+
+  const toast = (msg: string) => {
     const el = document.createElement('div')
     el.className = 'fixed top-3 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-3 py-1 rounded shadow z-50'
-    el.textContent = 'Restored from last session'
+    el.textContent = msg
     document.body.appendChild(el)
-    setTimeout(() => {
-      el.remove()
-    }, 2500)
+    setTimeout(() => { el.remove() }, 2500)
+  }
+
+  if (flag === 'changed') {
+    toast('Changes saved locally')
+  } else if (restored.value) {
+    toast('Restored from last session')
   }
 })
 </script>

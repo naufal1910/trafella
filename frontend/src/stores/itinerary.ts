@@ -56,18 +56,29 @@ export const useItineraryStore = defineStore('itinerary', () => {
     }
   }
 
-  function loadFromStorage() {
+  function loadFromStorage(): boolean {
+    let restored = false
     try {
       const raw = localStorage.getItem(LOCAL_STORAGE_KEY)
-      if (!raw) return
+      if (!raw) return false
       const parsed = JSON.parse(raw)
       if (parsed?.current?.itinerary?.days && parsed?.original?.itinerary?.days) {
         itinerary.value = parsed.current
         originalItinerary.value = parsed.original
+        restored = true
+        try {
+          Sentry.addBreadcrumb?.({
+            category: 'itinerary',
+            type: 'info',
+            level: 'info',
+            message: 'restoredFromStorage',
+          })
+        } catch {}
       }
     } catch (err) {
       // ignore corrupted cache
     }
+    return restored
   }
 
   function clearStorage() {
@@ -238,5 +249,6 @@ export const useItineraryStore = defineStore('itinerary', () => {
     resetEdits,
     clearItinerary,
     hasOriginal,
+    loadFromStorage,
   }
 })

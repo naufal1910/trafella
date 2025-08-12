@@ -1,6 +1,14 @@
-# frontend
+# Trafella Frontend (Vue 3 + Vite)
 
-This template should help get you started developing with Vue 3 in Vite.
+Staging (Vercel): https://trafella.vercel.app/
+
+Backend API (staging): https://trafella-api-staging.fly.dev
+
+To point the app at a custom API origin (e.g., staging), set:
+
+```
+VITE_API_BASE_URL="https://trafella-api-staging.fly.dev"
+```
 
 ## Recommended IDE Setup
 
@@ -19,6 +27,20 @@ See [Vite Configuration Reference](https://vite.dev/config/).
 ```sh
 npm install
 ```
+
+## Planner (Phase 2) — Feature Flag
+
+The experimental Planner (M1: draggable day list) is gated behind an env flag.
+
+1) Enable locally in `.env`:
+
+```
+VITE_PLANNER_ENABLED="true"
+```
+
+2) Start dev server and visit `/planner`.
+
+On staging, enable the flag in Vercel project settings before QA.
 
 ### Compile and Hot-Reload for Development
 

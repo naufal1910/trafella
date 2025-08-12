@@ -45,3 +45,11 @@ This file breaks down the work required to build the MVP, based on the approved 
 - [x] **3.5** Create deployment configurations (`Dockerfile`, `vercel.json`).
 - [x] **3.6** Deploy the application to a staging environment (Vercel/Fly.io).
 - [x] **3.7** Verify the end-to-end flow on the live staging URL.
+  - Frontend (staging): https://trafella.vercel.app/
+  - Backend API (staging): https://trafella-api-staging.fly.dev
+
+---
+
+### Notes
+
+- The MVP ships with a basic day-plan view. Manual time adjustments are deferred to Phase 2 per the product roadmap.

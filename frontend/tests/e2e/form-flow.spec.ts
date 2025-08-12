@@ -86,7 +86,8 @@ test('submits itinerary form and shows results', async ({ page }) => {
     const day1Heading = page.getByRole('heading', { name: /Day 1/i })
     await expect(day1Heading).toBeVisible({ timeout: 60_000 })
     // Scope checks within the Day 1 card
-    const day1Card = day1Heading.locator('xpath=..')
+    // Select the full day card container that wraps the heading and activity list
+    const day1Card = day1Heading.locator('xpath=ancestor::div[contains(@class, "rounded-lg")]')
     await expect(day1Card.getByText(/\d{4}-\d{2}-\d{2}/)).toBeVisible({ timeout: 60_000 })
     await expect(day1Card.getByText('Morning:')).toBeVisible({ timeout: 60_000 })
     await expect(day1Card.getByText('Afternoon:')).toBeVisible({ timeout: 60_000 })

@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useItineraryStore } from '@/stores/itinerary'
 import type { DayPlan } from '@/stores/itinerary'
+import * as Sentry from '@sentry/vue'
 
 const store = useItineraryStore()
 
 const itinerary = computed(() => store.itinerary)
+const canReset = computed(() => store.hasOriginal && store.itinerary)
 
 // Local editing state per-day
 const editing = ref<Record<number, boolean>>({})
@@ -30,6 +32,9 @@ function startEdit(day: DayPlan) {
 function cancelEdit(dayNumber: number) {
   editing.value[dayNumber] = false
   delete edits.value[dayNumber]
+  try {
+    Sentry.addBreadcrumb?.({ category: 'itinerary', type: 'user', level: 'info', message: 'cancelEdit', data: { dayNumber } })
+  } catch {}
 }
 
 function saveEdit(dayNumber: number) {
@@ -37,13 +42,29 @@ function saveEdit(dayNumber: number) {
   if (!patch) return
   store.updateDay(dayNumber, patch)
   editing.value[dayNumber] = false
+  try {
+    Sentry.addBreadcrumb?.({ category: 'itinerary', type: 'user', level: 'info', message: 'saveEdit', data: { dayNumber } })
+  } catch {}
 }
 </script>
 
 <template>
   <div v-if="itinerary" class="space-y-4">
     <div class="bg-white/60 rounded-lg p-4 shadow">
-      <h2 class="text-xl font-semibold">Itinerary for {{ itinerary.destination }} ({{ itinerary.duration_days }} days)</h2>
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <h2 class="text-xl font-semibold">Itinerary for {{ itinerary.destination }} ({{ itinerary.duration_days }} days)</h2>
+        <div class="flex gap-2">
+          <button
+            v-if="canReset"
+            class="px-3 py-1 text-sm rounded border bg-white hover:bg-gray-50"
+            @click="store.resetEdits()"
+          >Reset edits</button>
+          <button
+            class="px-3 py-1 text-sm rounded border bg-white hover:bg-gray-50"
+            @click="store.clearItinerary()"
+          >Clear</button>
+        </div>
+      </div>
     </div>
 
     <div class="grid gap-4">

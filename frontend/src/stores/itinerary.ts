@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import * as Sentry from '@sentry/vue'
 
 export interface ItineraryRequest {
@@ -34,8 +34,58 @@ export interface ItineraryResponse {
 
 export const useItineraryStore = defineStore('itinerary', () => {
   const itinerary = ref<ItineraryResponse | null>(null)
+  const originalItinerary = ref<ItineraryResponse | null>(null)
   const loading = ref(false)
   const error = ref<string | null>(null)
+
+  const LOCAL_STORAGE_KEY = 'trafella.itinerary.v1'
+
+  function deepClone<T>(obj: T): T {
+    return JSON.parse(JSON.stringify(obj))
+  }
+
+  function saveToStorage() {
+    try {
+      const payload = {
+        current: itinerary.value,
+        original: originalItinerary.value,
+      }
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(payload))
+    } catch (err) {
+      // non-fatal
+    }
+  }
+
+  function loadFromStorage(): boolean {
+    let restored = false
+    try {
+      const raw = localStorage.getItem(LOCAL_STORAGE_KEY)
+      if (!raw) return false
+      const parsed = JSON.parse(raw)
+      if (parsed?.current?.itinerary?.days && parsed?.original?.itinerary?.days) {
+        itinerary.value = parsed.current
+        originalItinerary.value = parsed.original
+        restored = true
+        try {
+          Sentry.addBreadcrumb?.({
+            category: 'itinerary',
+            type: 'info',
+            level: 'info',
+            message: 'restoredFromStorage',
+          })
+        } catch {}
+      }
+    } catch (err) {
+      // ignore corrupted cache
+    }
+    return restored
+  }
+
+  function clearStorage() {
+    try {
+      localStorage.removeItem(LOCAL_STORAGE_KEY)
+    } catch {}
+  }
 
   function daysDiff(start: string, end: string) {
     try {
@@ -121,7 +171,10 @@ export const useItineraryStore = defineStore('itinerary', () => {
       }
 
       const data = await response.json()
-      itinerary.value = normalizeResponse(data, request)
+      const normalized = normalizeResponse(data, request)
+      originalItinerary.value = deepClone(normalized)
+      itinerary.value = deepClone(normalized)
+      saveToStorage()
     } catch (e) {
       error.value = e instanceof Error ? e.message : 'An error occurred'
     } finally {
@@ -151,19 +204,51 @@ export const useItineraryStore = defineStore('itinerary', () => {
         days: updatedDays,
       },
     }
+    try {
+      Sentry.addBreadcrumb?.({
+        category: 'itinerary',
+        type: 'user',
+        level: 'info',
+        message: 'updateDay',
+        data: { dayNumber, keys: Object.keys(patch || {}) },
+      })
+    } catch {}
+    saveToStorage()
+  }
+
+  function resetEdits() {
+    if (!originalItinerary.value) return
+    itinerary.value = deepClone(originalItinerary.value)
+    try {
+      Sentry.addBreadcrumb?.({
+        category: 'itinerary',
+        type: 'user',
+        level: 'info',
+        message: 'resetEdits',
+      })
+    } catch {}
+    saveToStorage()
   }
 
   function clearItinerary() {
     itinerary.value = null
+    originalItinerary.value = null
     error.value = null
+    clearStorage()
   }
+
+  const hasOriginal = computed(() => !!originalItinerary.value)
 
   return {
     itinerary,
+    originalItinerary,
     loading,
     error,
     generateItinerary,
     updateDay,
+    resetEdits,
     clearItinerary,
+    hasOriginal,
+    loadFromStorage,
   }
 })

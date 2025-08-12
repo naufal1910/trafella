@@ -18,7 +18,7 @@ describe('useGeocoding', () => {
     
     const { geocode } = useGeocoding()
     
-    const result = await geocode('KLCC Tower', 0) // No debounce for test
+    const result = await geocode('KLCC Tower', 0, 'Kuala Lumpur') // No debounce for test
     
     // Should return null when geocoding fails (component will handle fallback)
     expect(result).toBeNull()
@@ -43,7 +43,7 @@ describe('useGeocoding', () => {
     })
 
     const { geocode } = useGeocoding()
-    const result = await geocode('KLCC Tower', 0) // No debounce for test
+    const result = await geocode('KLCC Tower', 0, 'Kuala Lumpur') // No debounce for test
     
     expect(result).toEqual({
       lat: 3.1578,
@@ -60,7 +60,7 @@ describe('useGeocoding', () => {
     })
 
     const { geocode } = useGeocoding()
-    const result = await geocode('Invalid Location', 0)
+    const result = await geocode('Invalid Location', 0, 'Jakarta')
     
     expect(result).toBeNull()
   })
@@ -80,11 +80,11 @@ describe('useGeocoding', () => {
     const { geocode } = useGeocoding()
     
     // First call should make API request
-    const result1 = await geocode('Test Location', 0)
+    const result1 = await geocode('Test Location', 0, 'Jakarta')
     expect(result1?.lat).toBe(3.1578)
     
     // Second call should use cache
-    const result2 = await geocode('Test Location', 0)
+    const result2 = await geocode('Test Location', 0, 'Jakarta')
     expect(result2?.lat).toBe(3.1578)
     
     // Should only have made one API call
@@ -94,10 +94,10 @@ describe('useGeocoding', () => {
   it('returns null for empty query', async () => {
     const { geocode } = useGeocoding()
     
-    const result = await geocode('', 0)
+    const result = await geocode('', 0, 'Jakarta')
     expect(result).toBeNull()
     
-    const result2 = await geocode('   ', 0)
+    const result2 = await geocode('   ', 0, 'Jakarta')
     expect(result2).toBeNull()
   })
 })

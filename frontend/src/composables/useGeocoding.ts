@@ -20,30 +20,61 @@ const nominatimProvider: GeocodingProvider = {
   name: 'nominatim',
   async geocode(query: string): Promise<GeocodingResult | null> {
     try {
-      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`
+      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1&countrycodes=id`
+      
+      console.log('Geocoding query:', query)
+      
       const response = await fetch(url, {
         headers: {
           'User-Agent': 'Trafella/1.0 (https://trafella.com)', // Required by Nominatim
         },
       })
       
-      if (!response.ok) return null
+      if (!response.ok) {
+        console.warn('Geocoding API error:', response.status, response.statusText)
+        return null
+      }
       
       const data = await response.json()
-      if (!data || data.length === 0) return null
+      if (!data || data.length === 0) {
+        console.warn('No geocoding results for:', query)
+        return null
+      }
       
       const result = data[0]
-      return {
+      const geocodingResult = {
         lat: parseFloat(result.lat),
         lng: parseFloat(result.lon),
         display_name: result.display_name,
         confidence: parseFloat(result.importance || '0'),
       }
+      
+      console.log('Geocoding success:', query, '->', geocodingResult)
+      return geocodingResult
     } catch (error) {
-      console.warn('Geocoding failed:', error)
+      console.warn('Geocoding failed:', query, error)
       return null
     }
   },
+}
+
+// Enhance query with city context for better geocoding accuracy
+function enhanceQuery(query: string, destination?: string): string {
+  const lowercaseQuery = query.toLowerCase()
+  const destLower = destination?.toLowerCase() || ''
+  
+  // If query already contains destination or country, use as-is
+  if (destLower && (lowercaseQuery.includes(destLower) || 
+      lowercaseQuery.includes('indonesia') || 
+      lowercaseQuery.includes('malaysia') ||
+      lowercaseQuery.includes('singapore') ||
+      lowercaseQuery.includes('thailand'))) {
+    return query
+  }
+  
+  // Add destination context for better accuracy, default to Jakarta
+  const contextDestination = destination || 'Jakarta, Indonesia'
+  return `${query}, ${contextDestination}`
 }
 
 // Mock provider for testing/development
@@ -93,10 +124,12 @@ export function useGeocoding() {
   // Debounced geocoding with cache
   let debounceTimer: number | null = null
   
-  async function geocode(query: string, debounceMs = 500): Promise<GeocodingResult | null> {
+  async function geocode(query: string, debounceMs = 500, destination?: string): Promise<GeocodingResult | null> {
     if (!query.trim()) return null
     
-    const cacheKey = `${providerName.value}:${query.toLowerCase().trim()}`
+    // Enhance query with destination context for better accuracy
+    const enhancedQuery = enhanceQuery(query, destination)
+    const cacheKey = `${providerName.value}:${enhancedQuery.toLowerCase().trim()}`
     
     // Check cache first
     if (geocodeCache.has(cacheKey)) {
@@ -115,7 +148,7 @@ export function useGeocoding() {
         error.value = null
         
         try {
-          const result = await provider.value.geocode(query)
+          const result = await provider.value.geocode(enhancedQuery)
           
           // Cache the result (including null results to avoid repeated failed requests)
           geocodeCache.set(cacheKey, result)

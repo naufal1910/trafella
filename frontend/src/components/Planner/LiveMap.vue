@@ -23,10 +23,45 @@ function keyFor(dayNumber: number, id: DaySlot) {
   return `${dayNumber}:${id}`
 }
 
+// Get fallback coordinates based on destination
+function getFallbackCoordinates(destination?: string): { lat: number; lng: number } {
+  // Default coordinates for major Southeast Asian cities
+  const cityCoords: Record<string, { lat: number; lng: number }> = {
+    'jakarta': { lat: -6.2088, lng: 106.8456 },
+    'bali': { lat: -8.3405, lng: 115.0920 },
+    'denpasar': { lat: -8.6705, lng: 115.2126 },
+    'yogyakarta': { lat: -7.7956, lng: 110.3695 },
+    'bandung': { lat: -6.9175, lng: 107.6191 },
+    'surabaya': { lat: -7.2575, lng: 112.7521 },
+    'kuala lumpur': { lat: 3.1390, lng: 101.6869 },
+    'singapore': { lat: 1.3521, lng: 103.8198 },
+    'bangkok': { lat: 13.7563, lng: 100.5018 },
+    'manila': { lat: 14.5995, lng: 120.9842 },
+    'ho chi minh': { lat: 10.8231, lng: 106.6297 },
+    'hanoi': { lat: 21.0285, lng: 105.8542 }
+  }
+  
+  if (destination) {
+    const destLower = destination.toLowerCase()
+    // Try to find matching city
+    for (const [city, coords] of Object.entries(cityCoords)) {
+      if (destLower.includes(city)) {
+        return coords
+      }
+    }
+  }
+  
+  // Default to Jakarta if no match found
+  return cityCoords.jakarta
+}
+
 async function getCoordinates(dayNumber: number, id: DaySlot, label: string): Promise<[number, number]> {
+  // Get destination context for both geocoding and fallback
+  const destination = store.itinerary?.destination
+  
   try {
-    // Try geocoding first
-    const result = await geocode(label, 100) // Short debounce for map updates
+    // Try geocoding first with destination context
+    const result = await geocode(label, 100, destination) // Short debounce for map updates
     
     if (result && typeof result.lat === 'number' && typeof result.lng === 'number') {
       return [result.lat, result.lng]
@@ -36,11 +71,20 @@ async function getCoordinates(dayNumber: number, id: DaySlot, label: string): Pr
   }
   
   // Always fallback to pseudo coords if geocoding fails or returns invalid data
+  // Use destination-aware fallback coordinates
+  const fallbackCoords = getFallbackCoordinates(destination)
   const idIndex = id === 'morning' ? 0 : id === 'afternoon' ? 1 : 2
   let hash = 0
   for (let i = 0; i < label.length; i++) hash = (hash * 31 + label.charCodeAt(i)) >>> 0
-  const lat = ((dayNumber * 7 + idIndex * 17 + (hash % 120)) % 120) - 60 // [-60, 60]
-  const lng = ((dayNumber * 13 + idIndex * 29 + (hash % 360)) % 360) - 180 // [-180, 180]
+  
+  const variation = 0.15 // ~15km radius for better spread
+  
+  // Spread markers more by day to avoid clustering
+  const dayOffset = (dayNumber - 1) * 0.03 // Each day gets different area
+  const lat = fallbackCoords.lat + dayOffset + ((idIndex * 37 + (hash % 100)) % 100 - 50) * variation / 50
+  const lng = fallbackCoords.lng + dayOffset + (((idIndex * 41 + ((hash >> 8) % 100)) % 100 - 50) * variation / 50)
+  
+  console.log('Using fallback coordinates for', label, ':', [lat, lng])
   return [lat, lng]
 }
 
@@ -64,13 +108,23 @@ async function rebuildMarkers() {
     const items = store.getDayItems(d.day_number)
     return items.map(async (it) => {
       const latlng = await getCoordinates(d.day_number, it.id, it.label)
+      // Different colors for each day
+      const dayColors = {
+        1: { color: '#dc2626', fillColor: '#ef4444' }, // red
+        2: { color: '#2563eb', fillColor: '#3b82f6' }, // blue  
+        3: { color: '#16a34a', fillColor: '#22c55e' }, // green
+        4: { color: '#ca8a04', fillColor: '#eab308' }, // yellow
+        5: { color: '#9333ea', fillColor: '#a855f7' }, // purple
+      }
+      const colors = dayColors[d.day_number] || dayColors[1]
+      
       const marker = L.circleMarker(latlng, {
-        radius: 8,
-        color: '#2563eb',
-        weight: 2,
-        opacity: 0.9,
-        fillColor: '#3b82f6',
-        fillOpacity: 0.5,
+        radius: 10,
+        color: colors.color,
+        weight: 3,
+        opacity: 1,
+        fillColor: colors.fillColor,
+        fillOpacity: 0.7,
       })
       marker.addTo(markersLayer)
       marker.on('click', () => store.selectActivity(d.day_number, it.id))
@@ -79,6 +133,7 @@ async function rebuildMarkers() {
   })
   
   await Promise.all(markerPromises)
+  console.log('Total markers created:', markerIndex.size)
   applySelection()
 }
 
@@ -106,9 +161,12 @@ onMounted(async () => {
   // Basic map init
   if (mapEl.value) {
     const tilesUrl = (import.meta as any).env?.VITE_MAP_TILES_URL || 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+    // Use destination-aware center coordinates
+    const destination = store.itinerary?.destination
+    const centerCoords = getFallbackCoordinates(destination)
     map = L.map(mapEl.value, {
-      center: [0, 0],
-      zoom: 2,
+      center: [centerCoords.lat, centerCoords.lng],
+      zoom: 10, // Wider view to see all markers
       zoomControl: true,
     })
     L.tileLayer(tilesUrl, {
@@ -130,7 +188,7 @@ watch(
 )
 
 watch(
-  store.selected as any,
+  () => store.selected,
   () => applySelection(),
   { deep: true }
 )

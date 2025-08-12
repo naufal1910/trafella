@@ -2,6 +2,10 @@
 
 AI-powered travel itinerary generator built with FastAPI (backend) and Vue 3 (frontend).
 
+## Staging Environments
+- Frontend (Vercel): https://trafella.vercel.app/
+- Backend API (Fly.io): https://trafella-api-staging.fly.dev
+
 ## Quickstart
 
 Prerequisites:
@@ -55,7 +59,7 @@ Frontend e2e tests (Playwright):
 ```
 cd frontend
 npx playwright install
-npm run dev   # in a separate terminal (or set PLAYWRIGHT_BASE_URL to your staging URL)
+npm run dev   # in a separate terminal (or set PLAYWRIGHT_BASE_URL=https://trafella.vercel.app)
 npm run test:e2e
 ```
 

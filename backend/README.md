@@ -24,6 +24,12 @@ Health check:
 GET http://127.0.0.1:8000/health
 ```
 
+## Staging
+
+- Base URL: https://trafella-api-staging.fly.dev
+- Health: https://trafella-api-staging.fly.dev/health
+- OpenAPI Docs: https://trafella-api-staging.fly.dev/docs
+
 ## Telemetry (Sentry)
 
 Sentry is conditionally initialized via environment variables. Set these in `.env` or your host:

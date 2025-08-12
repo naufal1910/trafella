@@ -8,9 +8,11 @@
 <script setup lang="ts">
 import { onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import { useItineraryStore, type DaySlot } from '@/stores/itinerary'
+import { useGeocoding } from '@/composables/useGeocoding'
 
 const mapEl = ref<HTMLDivElement | null>(null)
 const store = useItineraryStore()
+const { geocode } = useGeocoding()
 
 let L: any = null
 let map: any = null
@@ -21,8 +23,19 @@ function keyFor(dayNumber: number, id: DaySlot) {
   return `${dayNumber}:${id}`
 }
 
-function pseudoCoords(dayNumber: number, id: DaySlot, label: string): [number, number] {
-  // Deterministic pseudo coords for demo/testing without geocoder
+async function getCoordinates(dayNumber: number, id: DaySlot, label: string): Promise<[number, number]> {
+  try {
+    // Try geocoding first
+    const result = await geocode(label, 100) // Short debounce for map updates
+    
+    if (result && typeof result.lat === 'number' && typeof result.lng === 'number') {
+      return [result.lat, result.lng]
+    }
+  } catch (error) {
+    console.warn('Geocoding failed for', label, error)
+  }
+  
+  // Always fallback to pseudo coords if geocoding fails or returns invalid data
   const idIndex = id === 'morning' ? 0 : id === 'afternoon' ? 1 : 2
   let hash = 0
   for (let i = 0; i < label.length; i++) hash = (hash * 31 + label.charCodeAt(i)) >>> 0
@@ -41,14 +54,16 @@ function clearMarkers() {
   markersLayer = L.layerGroup().addTo(map)
 }
 
-function rebuildMarkers() {
+async function rebuildMarkers() {
   if (!L || !map) return
   clearMarkers()
   const days = store.itinerary?.itinerary?.days ?? []
-  days.forEach((d) => {
+  
+  // Process all markers concurrently
+  const markerPromises = days.flatMap((d) => {
     const items = store.getDayItems(d.day_number)
-    items.forEach((it, idx) => {
-      const latlng = pseudoCoords(d.day_number, it.id, it.label)
+    return items.map(async (it) => {
+      const latlng = await getCoordinates(d.day_number, it.id, it.label)
       const marker = L.circleMarker(latlng, {
         radius: 8,
         color: '#2563eb',
@@ -62,6 +77,8 @@ function rebuildMarkers() {
       markerIndex.set(keyFor(d.day_number, it.id), { layer: marker, latlng })
     })
   })
+  
+  await Promise.all(markerPromises)
   applySelection()
 }
 
@@ -105,7 +122,10 @@ onMounted(async () => {
 
 watch(
   () => store.itinerary,
-  () => rebuildMarkers(),
+  () => {
+    // Use setTimeout to avoid blocking UI during geocoding
+    setTimeout(() => rebuildMarkers(), 0)
+  },
   { deep: true }
 )
 

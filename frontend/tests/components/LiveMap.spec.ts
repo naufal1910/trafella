@@ -25,6 +25,19 @@ vi.mock('leaflet', () => {
   }
 })
 
+// Mock geocoding composable
+vi.mock('@/composables/useGeocoding', () => {
+  return {
+    useGeocoding: () => ({
+      geocode: vi.fn().mockResolvedValue({ lat: 3.1390, lng: 101.6869 }),
+      isLoading: { value: false },
+      error: { value: null },
+      provider: { value: 'mock' },
+      clearCache: vi.fn(),
+    }),
+  }
+})
+
 // Mock store
 const selectedRef = ref<any>(null)
 const getDayItemsMock = vi.fn()
@@ -79,6 +92,9 @@ describe('LiveMap.vue', () => {
 
   it('renders markers for items', async () => {
     const wrapper = mount(LiveMap)
+    // Wait for dynamic import + map init + async geocoding
+    await flush()
+    await flush()
     await flush()
     // Ensure at least one marker was added under mocked env
     expect((circleAddTo as any).mock.calls.length).toBeGreaterThanOrEqual(1)
@@ -87,7 +103,8 @@ describe('LiveMap.vue', () => {
 
   it('pans when selection changes', async () => {
     const wrapper = mount(LiveMap)
-    // wait for dynamic import + map init
+    // wait for dynamic import + map init + async geocoding
+    await flush()
     await flush()
     await nextTick()
     // trigger selection

@@ -26,9 +26,9 @@ This file breaks down the work required to implement the Planner with drag-and-d
 - [x] 2.4 Store: implement `selectActivity(day, id)` and selected state; Sentry breadcrumb
 - [x] 2.5 Wire list selection to map and map click to select list item
 - [x] 2.6 Env/config: support `VITE_MAP_TILES_URL` (default OSM); document in frontend README
-- [ ] 2.7 (Optional) Geocoding hook (provider toggled by `VITE_GEOCODER_PROVIDER`); debounce + cache
-- [ ] 2.8 E2E: Playwright test that selects an item and asserts visual selection/map focus (mock/staging-safe)
-- [ ] 2.9 Verify: unit/component/e2e tests pass; map lazy-load performant on mobile
+- [x] 2.7 (Optional) Geocoding hook (provider toggled by `VITE_GEOCODER_PROVIDER`); debounce + cache
+- [x] 2.8 E2E: Playwright test that selects an item and asserts visual selection/map focus (mock/staging-safe)
+- [x] 2.9 Verify: unit/component/e2e tests pass; map lazy-load performant on mobile
 
 ---
 

@@ -44,7 +44,7 @@ On staging, enable the flag in Vercel project settings before QA.
 
 ## Live Map (Phase 2 M2)
 
-Leaflet is used for the live map.
+Leaflet is used for the live map with optional geocoding.
 
 - CSS is imported globally in `src/main.ts` via `import 'leaflet/dist/leaflet.css'`.
 - You can customize the tile provider via env:
@@ -53,7 +53,13 @@ Leaflet is used for the live map.
 VITE_MAP_TILES_URL="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
 ```
 
-By default, OSM tiles are used.
+- You can configure the geocoding provider:
+
+```
+VITE_GEOCODER_PROVIDER="nominatim"  # or "mock" for development
+```
+
+By default, OSM tiles and Nominatim geocoding are used. The `mock` provider generates deterministic coordinates for testing without API calls.
 
 ### Compile and Hot-Reload for Development
 

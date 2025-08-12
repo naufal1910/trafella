@@ -1,6 +1,23 @@
 <script setup lang="ts">
+import { onMounted } from 'vue'
 import ItineraryForm from '@/components/ItineraryForm.vue'
 import ItineraryResults from '@/components/ItineraryResults.vue'
+import { useItineraryStore } from '@/stores/itinerary'
+
+const store = useItineraryStore()
+const restored = { value: false }
+onMounted(() => {
+  restored.value = store.loadFromStorage()
+  if (restored.value) {
+    const el = document.createElement('div')
+    el.className = 'fixed top-3 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-3 py-1 rounded shadow z-50'
+    el.textContent = 'Restored from last session'
+    document.body.appendChild(el)
+    setTimeout(() => {
+      el.remove()
+    }, 2500)
+  }
+})
 </script>
 
 <template>

@@ -8,13 +8,13 @@ This file breaks down the work required to implement the Planner with drag-and-d
 
 - [x] 1.1 (Test) Write unit tests for normalization to `items[]` per day and store `reorderActivity(day, from, to)`
 - [x] 1.2 (Test) Write component tests for `DayColumn`/`ActivityItem` drag reorder (vuedraggable) and persistence to localStorage
-- [ ] 1.3 Install and configure `vuedraggable@^4` + `sortablejs@^1`
-- [ ] 1.4 Implement frontend-only normalization from period strings to `items[]` with synthetic IDs
-- [ ] 1.5 Implement store selectors/actions: `getDayItems(day)`, `reorderActivity(day, from, to)`, Sentry breadcrumbs
-- [ ] 1.6 Implement `PlannerView`, `DayColumn`, `ActivityItem` with drag handles
-- [ ] 1.7 Add minimal keyboard fallback (move up/down buttons) for accessibility
-- [ ] 1.8 Docs: update frontend README with DnD usage and feature flag `VITE_PLANNER_ENABLED`
-- [ ] 1.9 Verify: all unit/component tests pass, DnD works locally
+- [x] 1.3 Install and configure `vuedraggable@^4` + `sortablejs@^1`
+- [x] 1.4 Implement frontend-only normalization from period strings to `items[]` with synthetic IDs
+- [x] 1.5 Implement store selectors/actions: `getDayItems(day)`, `reorderActivity(day, from, to)`, Sentry breadcrumbs
+- [x] 1.6 Implement `PlannerView`, `DayColumn`, `ActivityItem` with drag handles
+- [x] 1.7 Add minimal keyboard fallback (move up/down buttons) for accessibility
+- [x] 1.8 Docs: update frontend README with DnD usage and feature flag `VITE_PLANNER_ENABLED`
+- [x] 1.9 Verify: all unit/component tests pass, DnD works locally
 
 ---
 

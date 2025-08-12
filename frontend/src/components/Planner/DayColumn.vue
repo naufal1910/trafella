@@ -10,14 +10,18 @@
       @end="onDragEnd"
     >
       <template #item="{ element, index }">
-        <div class="flex items-center justify-between gap-2 py-2 px-2 rounded border bg-white">
+        <div
+          class="flex items-center justify-between gap-2 py-2 px-2 rounded border bg-white cursor-pointer"
+          :class="isSelected(element) ? 'ring-2 ring-blue-500 border-blue-500' : ''"
+          @click="onSelect(element)"
+        >
           <div class="flex items-center gap-2 min-w-0">
             <button class="drag-handle cursor-grab px-1" aria-label="Drag to reorder" title="Drag to reorder">⋮⋮</button>
             <span class="truncate text-sm">{{ element.label }}</span>
           </div>
           <div class="flex items-center gap-1 shrink-0">
-            <button class="text-xs px-2 py-1 border rounded" @click="moveUp(index)" aria-label="Move up">↑</button>
-            <button class="text-xs px-2 py-1 border rounded" @click="moveDown(index)" aria-label="Move down">↓</button>
+            <button class="text-xs px-2 py-1 border rounded" @click.stop="moveUp(index)" aria-label="Move up">↑</button>
+            <button class="text-xs px-2 py-1 border rounded" @click.stop="moveDown(index)" aria-label="Move down">↓</button>
           </div>
         </div>
       </template>
@@ -58,6 +62,15 @@ function moveUp(index: number) {
 
 function moveDown(index: number) {
   store.moveItemDown(props.dayNumber, index)
+}
+
+function onSelect(el: DayItem) {
+  store.selectActivity(props.dayNumber, el.id)
+}
+
+function isSelected(el: DayItem) {
+  const sel = store.selected
+  return !!sel && sel.dayNumber === props.dayNumber && sel.id === el.id
 }
 </script>
 

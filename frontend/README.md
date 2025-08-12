@@ -42,6 +42,19 @@ VITE_PLANNER_ENABLED="true"
 
 On staging, enable the flag in Vercel project settings before QA.
 
+## Live Map (Phase 2 M2)
+
+Leaflet is used for the live map.
+
+- CSS is imported globally in `src/main.ts` via `import 'leaflet/dist/leaflet.css'`.
+- You can customize the tile provider via env:
+
+```
+VITE_MAP_TILES_URL="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+```
+
+By default, OSM tiles are used.
+
 ### Compile and Hot-Reload for Development
 
 ```sh

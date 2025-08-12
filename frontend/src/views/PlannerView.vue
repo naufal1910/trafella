@@ -27,19 +27,24 @@
       <router-link class="text-blue-600 underline" to="/">Go to Home</router-link>
     </div>
 
-    <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      <DayColumn
-        v-for="day in days"
-        :key="day.day_number"
-        :day-number="day.day_number"
-        :title="day.title || `Day ${day.day_number}`"
-      />
+    <div v-else class="grid gap-4 lg:grid-cols-3">
+      <div class="lg:col-span-2 grid gap-4 sm:grid-cols-2">
+        <DayColumn
+          v-for="day in days"
+          :key="day.day_number"
+          :day-number="day.day_number"
+          :title="day.title || `Day ${day.day_number}`"
+        />
+      </div>
+      <div>
+        <LiveMap />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, defineAsyncComponent, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useItineraryStore } from '@/stores/itinerary'
 import DayColumn from '@/components/Planner/DayColumn.vue'
@@ -55,6 +60,8 @@ onMounted(() => {
 const hasPlan = computed(() => !!store.itinerary?.itinerary?.days?.length)
 
 const days = computed(() => store.itinerary?.itinerary?.days ?? [])
+
+const LiveMap = defineAsyncComponent(() => import('@/components/Planner/LiveMap.vue'))
 
 function onConfirm() {
   // Explicitly persist, then navigate back to Home

@@ -20,12 +20,12 @@ This file breaks down the work required to implement the Planner with drag-and-d
 
 ### Major Task 2: Live Map + List/Map Sync (M2)
 
-- [ ] 2.1 (Test) Component tests for `LiveMap` rendering markers and panning on selection (mock coords)
-- [ ] 2.2 Install and configure `leaflet@^1.9` (and `@types/leaflet` if needed); code split map bundle
-- [ ] 2.3 Implement `LiveMap` with markers; highlight selected item; pan/zoom on select
-- [ ] 2.4 Store: implement `selectActivity(day, id)` and selected state; Sentry breadcrumb
-- [ ] 2.5 Wire list selection to map and map click to select list item
-- [ ] 2.6 Env/config: support `VITE_MAP_TILES_URL` (default OSM); document in frontend README
+- [x] 2.1 (Test) Component tests for `LiveMap` rendering markers and panning on selection (mock coords)
+- [x] 2.2 Install and configure `leaflet@^1.9` (and `@types/leaflet` if needed); code split map bundle
+- [x] 2.3 Implement `LiveMap` with markers; highlight selected item; pan/zoom on select
+- [x] 2.4 Store: implement `selectActivity(day, id)` and selected state; Sentry breadcrumb
+- [x] 2.5 Wire list selection to map and map click to select list item
+- [x] 2.6 Env/config: support `VITE_MAP_TILES_URL` (default OSM); document in frontend README
 - [ ] 2.7 (Optional) Geocoding hook (provider toggled by `VITE_GEOCODER_PROVIDER`); debounce + cache
 - [ ] 2.8 E2E: Playwright test that selects an item and asserts visual selection/map focus (mock/staging-safe)
 - [ ] 2.9 Verify: unit/component/e2e tests pass; map lazy-load performant on mobile

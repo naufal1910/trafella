@@ -287,6 +287,22 @@ export const useItineraryStore = defineStore('itinerary', () => {
     reorderActivity(dayNumber, index, index + 1)
   }
 
+  // --- Phase 2 Planner (M2) selection ---
+  const selected = ref<{ dayNumber: number; id: DaySlot } | null>(null)
+
+  function selectActivity(dayNumber: number, id: DaySlot) {
+    selected.value = { dayNumber, id }
+    try {
+      Sentry.addBreadcrumb?.({
+        category: 'planner:select',
+        type: 'user',
+        level: 'info',
+        message: 'selected',
+        data: { dayNumber, id },
+      })
+    } catch {}
+  }
+
   function resetEdits() {
     if (!originalItinerary.value) return
     itinerary.value = deepClone(originalItinerary.value)
@@ -355,5 +371,8 @@ export const useItineraryStore = defineStore('itinerary', () => {
     reorderActivity,
     moveItemUp,
     moveItemDown,
+    // Planner (M2)
+    selected,
+    selectActivity,
   }
 })

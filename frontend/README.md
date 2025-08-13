@@ -42,6 +42,22 @@ VITE_PLANNER_ENABLED="true"
 
 On staging, enable the flag in Vercel project settings before QA.
 
+## Manual Time Adjustments (Phase 2 M3)
+
+The time edit UI (per-activity start/end inputs with validation and automatic reflow) is feature-flagged:
+
+1) Enable locally in `.env`:
+
+```
+VITE_TIME_EDIT_ENABLED="true"
+```
+
+2) Open `/planner` and adjust times. Activities will reflow to avoid overlaps and stay within day bounds (06:00–23:00).
+
+Notes:
+- Inline validation messages are shown for invalid formats or out-of-bounds inputs.
+- Sentry breadcrumbs (`planner:time_edit`) are recorded on edits/errors.
+
 ## Live Map (Phase 2 M2)
 
 Leaflet is used for the live map with optional geocoding.

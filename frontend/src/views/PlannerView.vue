@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-6xl mx-auto p-4">
+  <div class="mx-auto max-w-screen-2xl p-4 lg:px-6 min-h-screen">
     <div class="mb-4 flex items-center justify-between gap-3">
       <h1 class="text-xl font-semibold">Planner (M1)</h1>
       <div class="flex items-center gap-2">
@@ -27,19 +27,24 @@
       <router-link class="text-blue-600 underline" to="/">Go to Home</router-link>
     </div>
 
-    <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      <DayColumn
-        v-for="day in days"
-        :key="day.day_number"
-        :day-number="day.day_number"
-        :title="day.title || `Day ${day.day_number}`"
-      />
+    <div v-else class="grid gap-4 lg:gap-6 lg:grid-cols-3 xl:grid-cols-5 items-start">
+      <div class="lg:col-span-2 xl:col-span-3 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <DayColumn
+          v-for="day in days"
+          :key="day.day_number"
+          :day-number="day.day_number"
+          :title="day.title || `Day ${day.day_number}`"
+        />
+      </div>
+      <div class="lg:sticky lg:top-20 xl:col-span-2">
+        <LiveMap />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, defineAsyncComponent, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useItineraryStore } from '@/stores/itinerary'
 import DayColumn from '@/components/Planner/DayColumn.vue'
@@ -55,6 +60,8 @@ onMounted(() => {
 const hasPlan = computed(() => !!store.itinerary?.itinerary?.days?.length)
 
 const days = computed(() => store.itinerary?.itinerary?.days ?? [])
+
+const LiveMap = defineAsyncComponent(() => import('@/components/Planner/LiveMap.vue'))
 
 function onConfirm() {
   // Explicitly persist, then navigate back to Home

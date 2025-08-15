@@ -1,0 +1,66 @@
+# Page snapshot
+
+```yaml
+- heading "Planner (M1)" [level=1]
+- button "Reset changes and restore original itinerary": Reset
+- button "Back to Home (saves changes if any)": Back to Home
+- heading "Day 1" [level=3]
+- button "Drag to reorder": ⋮⋮
+- text: Petronas Towers
+- button "Move up": ↑
+- button "Move down": ↓
+- text: Start
+- textbox "Start": 09:00
+- text: End
+- textbox "End": 10:30
+- button "Drag to reorder": ⋮⋮
+- text: Batu Caves
+- button "Move up": ↑
+- button "Move down": ↓
+- text: Start
+- textbox "Start": 11:00
+- text: End
+- textbox "End": 12:30
+- button "Drag to reorder": ⋮⋮
+- text: Jalan Alor
+- button "Move up": ↑
+- button "Move down": ↓
+- text: Start
+- textbox "Start": 14:00
+- text: End
+- textbox "End": 16:00
+- heading "Day 2" [level=3]
+- button "Drag to reorder": ⋮⋮
+- text: KLCC Park
+- button "Move up": ↑
+- button "Move down": ↓
+- text: Start
+- textbox "Start": 09:00
+- text: End
+- textbox "End": 10:30
+- button "Drag to reorder": ⋮⋮
+- text: Bukit Bintang
+- button "Move up": ↑
+- button "Move down": ↓
+- text: Start
+- textbox "Start": 11:00
+- text: End
+- textbox "End": 12:30
+- button "Drag to reorder": ⋮⋮
+- text: Chinatown
+- button "Move up": ↑
+- button "Move down": ↓
+- text: Start
+- textbox "Start": 14:00
+- text: End
+- textbox "End": 16:00
+- heading "Live Map" [level=3]
+- img
+- button "Zoom in"
+- button "Zoom out"
+- link "Leaflet":
+  - /url: https://leafletjs.com
+- text: © OpenStreetMap contributors
+- img
+- img
+```

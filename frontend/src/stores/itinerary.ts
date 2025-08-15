@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import * as Sentry from '@sentry/vue'
 import { validateTimes, reflowTimes } from '@/utils/timeUtils'
+import type { ValidationResult } from '@/utils/timeUtils'
 import type { ActivityItem as PlannerActivityItem } from '@/types/planner'
 
 export interface ItineraryRequest {
@@ -51,6 +52,8 @@ export const useItineraryStore = defineStore('itinerary', () => {
   const error = ref<string | null>(null)
   // Phase 2 M3: local-only time edits per day
   const timeEdits = ref<Record<number, ActivityItem[]>>({})
+  // Phase 2 M3: track validation errors per day for UI
+  const timeValidation = ref<Record<number, string[]>>({})
 
   const LOCAL_STORAGE_KEY = 'trafella.itinerary.v1'
 
@@ -325,7 +328,7 @@ export const useItineraryStore = defineStore('itinerary', () => {
     dayNumber: number,
     id: string,
     patch: Partial<Pick<ActivityItem, 'startTime' | 'endTime'>>
-  ) {
+  ): ValidationResult | undefined {
     const list = getDayActivitiesWithTimes(dayNumber)
     const idx = list.findIndex((x) => String(x.id) === String(id))
     if (idx === -1) return
@@ -333,6 +336,9 @@ export const useItineraryStore = defineStore('itinerary', () => {
     // Always reflow to maintain contiguity and preserve durations per spec
     const next = reflowTimes(list, edited)
     timeEdits.value[dayNumber] = deepClone(next)
+    // Validate after reflow and surface to UI
+    const validation = validateTimes(next)
+    timeValidation.value[dayNumber] = [...validation.errors]
     try {
       Sentry.addBreadcrumb?.({
         category: 'planner:time_edit',
@@ -342,6 +348,7 @@ export const useItineraryStore = defineStore('itinerary', () => {
         data: { dayNumber, id, changed: Object.keys(patch) },
       })
     } catch {}
+    return validation
   }
 
   // --- Phase 2 Planner (M2) selection ---
@@ -431,6 +438,7 @@ export const useItineraryStore = defineStore('itinerary', () => {
     // Planner (M3)
     getDayActivitiesWithTimes,
     updateActivityTime,
+    getTimeValidation: (dayNumber: number) => deepClone(timeValidation.value[dayNumber] || []),
     // Planner (M2)
     selected,
     selectActivity,

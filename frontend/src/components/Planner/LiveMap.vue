@@ -109,14 +109,14 @@ async function rebuildMarkers() {
     return items.map(async (it) => {
       const latlng = await getCoordinates(d.day_number, it.id, it.label)
       // Different colors for each day
-      const dayColors = {
+      const dayColors: Record<number, { color: string; fillColor: string }> = {
         1: { color: '#dc2626', fillColor: '#ef4444' }, // red
         2: { color: '#2563eb', fillColor: '#3b82f6' }, // blue  
         3: { color: '#16a34a', fillColor: '#22c55e' }, // green
         4: { color: '#ca8a04', fillColor: '#eab308' }, // yellow
         5: { color: '#9333ea', fillColor: '#a855f7' }, // purple
       }
-      const colors = dayColors[d.day_number] || dayColors[1]
+      const colors = dayColors[d.day_number] ?? dayColors[1]
       
       const marker = L.circleMarker(latlng, {
         radius: 10,

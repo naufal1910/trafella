@@ -49,7 +49,7 @@ function saveEdit(dayNumber: number) {
 </script>
 
 <template>
-  <div v-if="itinerary" class="space-y-4">
+  <div v-if="itinerary" class="space-y-4" data-testid="itinerary-results">
     <div class="bg-white/60 rounded-lg p-4 shadow">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <h2 class="text-xl font-semibold">Itinerary for {{ itinerary.destination }} ({{ itinerary.duration_days }} days)</h2>

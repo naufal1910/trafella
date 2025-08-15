@@ -111,10 +111,15 @@ export function useGeocoding() {
   const isLoading = ref(false)
   const error = ref<string | null>(null)
   
-  // Get provider from environment variable
+  // Get provider from localStorage (for tests) or environment variable
   const providerName = computed(() => {
+    let fromStorage: string | null = null
+    try {
+      fromStorage = localStorage.getItem('VITE_GEOCODER_PROVIDER')
+    } catch {}
     const envProvider = (import.meta as any).env?.VITE_GEOCODER_PROVIDER || 'nominatim'
-    return envProvider.toLowerCase()
+    const chosen = (fromStorage || envProvider).toString()
+    return chosen.toLowerCase()
   })
   
   const provider = computed(() => {

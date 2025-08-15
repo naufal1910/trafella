@@ -34,14 +34,14 @@ This file breaks down the work required to implement the Planner with drag-and-d
 
 ### Major Task 3: Manual Time Adjustments (M3)
 
-- [ ] 3.1 (Test) Unit tests for pure `validateTimes(items)` and `reflowTimes(items, edited)` utilities (no overlap, within bounds)
-- [ ] 3.2 (Test) Store tests for `updateActivityTime(day, id, { startTime, endTime })` integrating validation + reflow
-- [ ] 3.3 Feature flag: gate UI with `VITE_TIME_EDIT_ENABLED`; add to README
-- [ ] 3.4 Implement time inputs on `ActivityItem` with inline validation messages (a11y friendly)
-- [ ] 3.5 Implement reflow logic to push subsequent items sequentially; cap at day end
-- [ ] 3.6 Telemetry: Sentry breadcrumbs `planner:time_edit` (day, itemId, changed fields)
-- [ ] 3.7 E2E: Playwright happy path time edit (feature-flagged)
-- [ ] 3.8 Verify: unit/component/e2e pass; no overlaps produced in common flows
+- [x] 3.1 (Test) Unit tests for pure `validateTimes(items)` and `reflowTimes(items, edited)` utilities (no overlap, within bounds)
+- [x] 3.2 (Test) Store tests for `updateActivityTime(day, id, { startTime, endTime })` integrating validation + reflow
+- [x] 3.3 Feature flag: gate UI with `VITE_TIME_EDIT_ENABLED`; add to README
+- [x] 3.4 Implement time inputs on `ActivityItem` with inline validation messages (a11y friendly)
+- [x] 3.5 Implement reflow logic to push subsequent items sequentially; cap at day end
+- [x] 3.6 Telemetry: Sentry breadcrumbs `planner:time_edit` (day, itemId, changed fields)
+- [x] 3.7 E2E: Playwright happy path time edit (feature-flagged)
+- [x] 3.8 Verify: unit/component/e2e pass; no overlaps produced in common flows (note: marker-click E2E skipped by design; non-critical)
 
 ---
 

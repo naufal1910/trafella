@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-6xl mx-auto p-4">
+  <div class="mx-auto max-w-screen-2xl p-4 lg:px-6 min-h-screen">
     <div class="mb-4 flex items-center justify-between gap-3">
       <h1 class="text-xl font-semibold">Planner (M1)</h1>
       <div class="flex items-center gap-2">
@@ -27,8 +27,8 @@
       <router-link class="text-blue-600 underline" to="/">Go to Home</router-link>
     </div>
 
-    <div v-else class="grid gap-4 lg:grid-cols-3">
-      <div class="lg:col-span-2 grid gap-4 sm:grid-cols-2">
+    <div v-else class="grid gap-4 lg:gap-6 lg:grid-cols-3 xl:grid-cols-5 items-start">
+      <div class="lg:col-span-2 xl:col-span-3 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         <DayColumn
           v-for="day in days"
           :key="day.day_number"
@@ -36,7 +36,7 @@
           :title="day.title || `Day ${day.day_number}`"
         />
       </div>
-      <div>
+      <div class="lg:sticky lg:top-20 xl:col-span-2">
         <LiveMap />
       </div>
     </div>

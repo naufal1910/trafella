@@ -1,7 +1,7 @@
 <template>
-  <div class="rounded border bg-white/50 p-2">
+  <div class="rounded border bg-white/50 p-2 lg:p-3">
     <h3 class="font-medium text-gray-800 mb-2">Live Map</h3>
-    <div ref="mapEl" class="w-full h-64 rounded border" aria-label="Itinerary map"></div>
+    <div ref="mapEl" class="w-full h-72 sm:h-80 lg:h-[calc(100vh-8rem)] rounded border" aria-label="Itinerary map"></div>
   </div>
 </template>
 
@@ -188,9 +188,8 @@ watch(
 )
 
 watch(
-  () => store.selected,
-  () => applySelection(),
-  { deep: true }
+  () => (store as any).selected?.value,
+  () => applySelection()
 )
 
 onBeforeUnmount(() => {

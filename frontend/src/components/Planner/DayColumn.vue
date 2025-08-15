@@ -61,7 +61,7 @@
 
 <script setup lang="ts">
 import draggable from 'vuedraggable'
-import { ref, watch, computed, onMounted } from 'vue'
+import { ref, watch, computed, onMounted, unref } from 'vue'
 import { useItineraryStore, type DayItem } from '@/stores/itinerary'
 import type { ActivityItem } from '@/types/planner'
 
@@ -104,7 +104,7 @@ function onSelect(el: DayItem) {
 }
 
 function isSelected(el: DayItem) {
-  const sel = store.selected
+  const sel = unref(store.selected as any)
   return !!sel && sel.dayNumber === props.dayNumber && sel.id === el.id
 }
 

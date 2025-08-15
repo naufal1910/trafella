@@ -33,7 +33,7 @@ onMounted(() => {
 
 <template>
   <div class="min-h-screen py-8">
-    <div class="mx-auto max-w-5xl px-4">
+    <div class="mx-auto max-w-screen-2xl px-4 lg:px-6">
       <header class="mb-8">
         <h1 class="text-3xl font-bold">Trafella — AI Itinerary Generator</h1>
         <p class="text-gray-600">Plan a trip in seconds. Enter details below.</p>
@@ -42,9 +42,13 @@ onMounted(() => {
         </div>
       </header>
 
-      <div class="grid gap-6 md:grid-cols-2">
-        <ItineraryForm />
-        <ItineraryResults />
+      <div class="grid gap-6 md:grid-cols-3">
+        <div class="md:col-span-1">
+          <ItineraryForm />
+        </div>
+        <div class="md:col-span-2">
+          <ItineraryResults />
+        </div>
       </div>
     </div>
   </div>

@@ -1,6 +1,9 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import * as Sentry from '@sentry/vue'
+import { validateTimes, reflowTimes } from '@/utils/timeUtils'
+import type { ValidationResult } from '@/utils/timeUtils'
+import type { ActivityItem as PlannerActivityItem } from '@/types/planner'
 
 export interface ItineraryRequest {
   destination: string
@@ -30,6 +33,10 @@ export interface DayItem {
   label: string
 }
 
+// Phase 2 M3: Time-based activity item for manual time adjustments
+// Phase 2 M3: Time-based activity item for manual time adjustments
+export type ActivityItem = PlannerActivityItem
+
 export interface ItineraryResponse {
   destination: string
   duration_days: number
@@ -43,6 +50,10 @@ export const useItineraryStore = defineStore('itinerary', () => {
   const originalItinerary = ref<ItineraryResponse | null>(null)
   const loading = ref(false)
   const error = ref<string | null>(null)
+  // Phase 2 M3: local-only time edits per day
+  const timeEdits = ref<Record<number, ActivityItem[]>>({})
+  // Phase 2 M3: track validation errors per day for UI
+  const timeValidation = ref<Record<number, string[]>>({})
 
   const LOCAL_STORAGE_KEY = 'trafella.itinerary.v1'
 
@@ -287,6 +298,75 @@ export const useItineraryStore = defineStore('itinerary', () => {
     reorderActivity(dayNumber, index, index + 1)
   }
 
+  // --- Phase 2 Planner (M3) time utilities ---
+  function defaultsForItems(items: DayItem[]): ActivityItem[] {
+    // Basic defaults aligned with tests/spec
+    const defaults: Array<{ start: string; end: string }> = [
+      { start: '09:00', end: '10:30' },
+      { start: '11:00', end: '12:30' },
+      { start: '14:00', end: '16:00' },
+    ]
+    return items.map((it, idx) => ({
+      id: String(it.id),
+      name: it.label,
+      startTime: defaults[Math.min(idx, defaults.length - 1)].start,
+      endTime: defaults[Math.min(idx, defaults.length - 1)].end,
+      description: it.label,
+      location: '',
+    }))
+  }
+
+  function getDayActivitiesWithTimes(dayNumber: number): ActivityItem[] {
+    if (timeEdits.value[dayNumber]) return deepClone(timeEdits.value[dayNumber])
+    const items = getDayItems(dayNumber)
+    const seeded = defaultsForItems(items)
+    timeEdits.value[dayNumber] = deepClone(seeded)
+    return deepClone(seeded)
+  }
+
+  function updateActivityTime(
+    dayNumber: number,
+    id: string,
+    patch: Partial<Pick<ActivityItem, 'startTime' | 'endTime'>>
+  ): ValidationResult | undefined {
+    const list = getDayActivitiesWithTimes(dayNumber)
+    const idx = list.findIndex((x) => String(x.id) === String(id))
+    if (idx === -1) return
+    const edited: ActivityItem = { ...list[idx], ...patch }
+    // Always reflow to maintain contiguity and preserve durations per spec
+    const next = reflowTimes(list, edited)
+    timeEdits.value[dayNumber] = deepClone(next)
+    // Validate after reflow and surface to UI
+    const validation = validateTimes(next)
+    timeValidation.value[dayNumber] = [...validation.errors]
+    try {
+      Sentry.addBreadcrumb?.({
+        category: 'planner:time_edit',
+        type: 'user',
+        level: 'info',
+        message: 'updateActivityTime',
+        data: { dayNumber, id, changed: Object.keys(patch) },
+      })
+    } catch {}
+    return validation
+  }
+
+  // --- Phase 2 Planner (M2) selection ---
+  const selected = ref<{ dayNumber: number; id: DaySlot } | null>(null)
+
+  function selectActivity(dayNumber: number, id: DaySlot) {
+    selected.value = { dayNumber, id }
+    try {
+      Sentry.addBreadcrumb?.({
+        category: 'planner:select',
+        type: 'user',
+        level: 'info',
+        message: 'selected',
+        data: { dayNumber, id },
+      })
+    } catch {}
+  }
+
   function resetEdits() {
     if (!originalItinerary.value) return
     itinerary.value = deepClone(originalItinerary.value)
@@ -355,5 +435,12 @@ export const useItineraryStore = defineStore('itinerary', () => {
     reorderActivity,
     moveItemUp,
     moveItemDown,
+    // Planner (M3)
+    getDayActivitiesWithTimes,
+    updateActivityTime,
+    getTimeValidation: (dayNumber: number) => deepClone(timeValidation.value[dayNumber] || []),
+    // Planner (M2)
+    selected,
+    selectActivity,
   }
 })

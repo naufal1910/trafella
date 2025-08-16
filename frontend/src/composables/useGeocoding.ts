@@ -1,4 +1,5 @@
 import { ref, computed } from 'vue'
+import * as Sentry from '@sentry/vue'
 
 export interface GeocodingResult {
   lat: number
@@ -117,7 +118,7 @@ export function useGeocoding() {
     try {
       fromStorage = localStorage.getItem('VITE_GEOCODER_PROVIDER')
     } catch {}
-    const envProvider = (import.meta as any).env?.VITE_GEOCODER_PROVIDER || 'nominatim'
+    const envProvider = import.meta.env.VITE_GEOCODER_PROVIDER ?? 'nominatim'
     const chosen = (fromStorage || envProvider).toString()
     return chosen.toLowerCase()
   })
@@ -138,6 +139,15 @@ export function useGeocoding() {
     
     // Check cache first
     if (geocodeCache.has(cacheKey)) {
+      try {
+        Sentry.addBreadcrumb?.({
+          category: 'geocode',
+          type: 'info',
+          level: 'info',
+          message: 'cache_hit',
+          data: { provider: providerName.value, query: enhancedQuery },
+        })
+      } catch {}
       return geocodeCache.get(cacheKey) || null
     }
     
@@ -153,14 +163,43 @@ export function useGeocoding() {
         error.value = null
         
         try {
+          try {
+            Sentry.addBreadcrumb?.({
+              category: 'geocode',
+              type: 'info',
+              level: 'info',
+              message: 'start',
+              data: { provider: providerName.value, query: enhancedQuery, destination },
+            })
+          } catch {}
           const result = await provider.value.geocode(enhancedQuery)
           
           // Cache the result (including null results to avoid repeated failed requests)
           geocodeCache.set(cacheKey, result)
+          try {
+            Sentry.addBreadcrumb?.({
+              category: 'geocode',
+              type: 'info',
+              level: result ? 'info' : 'warning',
+              message: result ? 'success' : 'no_result',
+              data: result
+                ? { provider: providerName.value, query: enhancedQuery, lat: result.lat, lng: result.lng, confidence: result.confidence }
+                : { provider: providerName.value, query: enhancedQuery },
+            })
+          } catch {}
           
           resolve(result)
         } catch (err) {
           error.value = err instanceof Error ? err.message : 'Geocoding failed'
+          try {
+            Sentry.addBreadcrumb?.({
+              category: 'geocode',
+              type: 'error',
+              level: 'error',
+              message: 'error',
+              data: { provider: providerName.value, query: enhancedQuery, error: String(err) },
+            })
+          } catch {}
           resolve(null)
         } finally {
           isLoading.value = false

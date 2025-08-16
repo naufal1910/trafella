@@ -47,10 +47,10 @@ This file breaks down the work required to implement the Planner with drag-and-d
 
 ### Major Task 4: A11y, Telemetry, and CI Integration (M4)
 
-- [ ] 4.1 (Test) Add basic a11y checks for keyboard navigation and focus management (component tests)
-- [ ] 4.2 A11y: ensure ARIA roles, live region for reorder announcement, visible focus, adequate hit areas
-- [ ] 4.3 Telemetry: ensure breadcrumbs for reorder/select/geocode/time_edit; add release tagging + source maps on Vercel
-- [ ] 4.4 CI: GitHub Actions workflow to run frontend unit tests and Playwright e2e (staging via `PLAYWRIGHT_BASE_URL`)
+- [x] 4.1 (Test) Add basic a11y checks for keyboard navigation and focus management (component tests)
+- [x] 4.2 A11y: ensure ARIA roles, live region for reorder announcement, visible focus, adequate hit areas
+- [x] 4.3 Telemetry: ensure breadcrumbs for reorder/select/geocode/time_edit; add release tagging + source maps on Vercel
+- [x] 4.4 CI: GitHub Actions workflow to run frontend unit tests and Playwright e2e (staging via `PLAYWRIGHT_BASE_URL`)
 - [ ] 4.5 Verify: CI green across PRs; Sentry error rate <1% during staging
 
 ---

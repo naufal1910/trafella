@@ -57,8 +57,8 @@ This file breaks down the work required to implement the Planner with drag-and-d
 
 ### Major Task 5: Staging Rollout & Sign-off (M5)
 
-- [ ] 5.1 (Test) Add a lightweight smoke e2e against staging covering: generate itinerary → reorder → select → (if enabled) time edit
+- [x] 5.1 (Test) Add a lightweight smoke e2e against staging covering: generate itinerary → reorder → select → (if enabled) time edit
 - [ ] 5.2 Enable `VITE_PLANNER_ENABLED=true` on Vercel staging; roll out `VITE_TIME_EDIT_ENABLED=true` after M3 passes
-- [ ] 5.3 Frontend README: document envs (`VITE_MAP_TILES_URL`, geocoder provider/keys)
+- [x] 5.3 Frontend README: document envs (`VITE_MAP_TILES_URL`, geocoder provider/keys)
 - [ ] 5.4 Observability: verify Sentry breadcrumbs/spans appear; review performance (Lighthouse/CrUX)
 - [ ] 5.5 Verify: run staging checklist; capture screenshots; mark Phase 2 feature ready

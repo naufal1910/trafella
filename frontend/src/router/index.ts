@@ -17,7 +17,7 @@ const routes = [
   },
 ]
 
-if (((import.meta as any).env?.VITE_PLANNER_ENABLED ?? '').toString().toLowerCase() === 'true') {
+if (String(import.meta.env.VITE_PLANNER_ENABLED ?? '').toLowerCase() === 'true') {
   routes.push({
     path: '/planner',
     name: 'planner',

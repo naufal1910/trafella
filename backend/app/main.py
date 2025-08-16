@@ -30,12 +30,17 @@ from app.routers import itinerary
 load_dotenv()
 
 dsn = os.getenv("SENTRY_DSN")
-if dsn and sentry_init and FastApiIntegration:
+# Allow disabling Sentry (e.g., during tests) and avoid heavy default integrations that
+# can import optional deps like LangChain/LangSmith which are not required for the API.
+enable_sentry = os.getenv("SENTRY_ENABLED", "1").lower() not in ("0", "false", "no")
+if dsn and enable_sentry and sentry_init and FastApiIntegration:
     sentry_init(
         dsn=dsn,
         integrations=[FastApiIntegration()],
         traces_sample_rate=float(os.getenv("SENTRY_TRACES_SAMPLE_RATE", "0")),
         environment=os.getenv("SENTRY_ENVIRONMENT", "development"),
+        # Disable default integrations to prevent pulling optional heavy deps during tests
+        default_integrations=False,
     )
 
 app = FastAPI(

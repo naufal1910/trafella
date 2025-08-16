@@ -142,7 +142,7 @@ export const useItineraryStore = defineStore('itinerary', () => {
   async function generateItinerary(request: ItineraryRequest) {
     loading.value = true
     error.value = null
-    const baseUrl = (import.meta as any).env?.VITE_API_BASE_URL || window.location.origin
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || window.location.origin
     
     try {
       const response = await (typeof (Sentry as any).startSpan === 'function'

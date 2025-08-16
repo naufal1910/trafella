@@ -9,6 +9,7 @@
 import { onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import { useItineraryStore, type DaySlot } from '@/stores/itinerary'
 import { useGeocoding } from '@/composables/useGeocoding'
+import * as Sentry from '@sentry/vue'
 
 const mapEl = ref<HTMLDivElement | null>(null)
 const store = useItineraryStore()
@@ -96,13 +97,26 @@ function clearMarkers() {
     } catch {}
   }
   markersLayer = L.layerGroup().addTo(map)
+  try {
+    Sentry.addBreadcrumb?.({ category: 'map', type: 'info', level: 'info', message: 'clear_markers' })
+  } catch {}
 }
 
 async function rebuildMarkers() {
   if (!L || !map) return
   clearMarkers()
   const days = store.itinerary?.itinerary?.days ?? []
-  
+  try {
+    const planned = days.reduce((acc, d) => acc + store.getDayItems(d.day_number).length, 0)
+    Sentry.addBreadcrumb?.({
+      category: 'map',
+      type: 'info',
+      level: 'info',
+      message: 'rebuild_start',
+      data: { days: days.map(d => d.day_number), planned }
+    })
+  } catch {}
+
   // Process all markers concurrently
   const markerPromises = days.flatMap((d) => {
     const items = store.getDayItems(d.day_number)
@@ -134,6 +148,15 @@ async function rebuildMarkers() {
   
   await Promise.all(markerPromises)
   console.log('Total markers created:', markerIndex.size)
+  try {
+    Sentry.addBreadcrumb?.({
+      category: 'map',
+      type: 'info',
+      level: 'info',
+      message: 'rebuild_done',
+      data: { created: markerIndex.size }
+    })
+  } catch {}
   applySelection()
 }
 
@@ -151,6 +174,15 @@ function applySelection() {
     try { hit.layer.setStyle && hit.layer.setStyle({ color: '#1d4ed8', fillColor: '#1d4ed8', radius: 8 }) } catch {}
     try { hit.layer.bringToFront && hit.layer.bringToFront() } catch {}
     try { map.setView(hit.latlng, Math.max(10, map.getZoom?.() || 10), { animate: true }) } catch {}
+    try {
+      Sentry.addBreadcrumb?.({
+        category: 'map:select',
+        type: 'info',
+        level: 'info',
+        message: 'apply_selection',
+        data: { dayNumber: sel.dayNumber, id: sel.id }
+      })
+    } catch {}
   }
 }
 
@@ -160,7 +192,7 @@ onMounted(async () => {
   L = (mod as any).default || mod
   // Basic map init
   if (mapEl.value) {
-    const tilesUrl = (import.meta as any).env?.VITE_MAP_TILES_URL || 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+    const tilesUrl = import.meta.env.VITE_MAP_TILES_URL || 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
     // Use destination-aware center coordinates
     const destination = store.itinerary?.destination
     const centerCoords = getFallbackCoordinates(destination)
@@ -174,6 +206,15 @@ onMounted(async () => {
       maxZoom: 19,
     }).addTo(map)
     markersLayer = L.layerGroup().addTo(map)
+    try {
+      Sentry.addBreadcrumb?.({
+        category: 'map',
+        type: 'info',
+        level: 'info',
+        message: 'init',
+        data: { tilesUrl, destination }
+      })
+    } catch {}
     rebuildMarkers()
   }
 })

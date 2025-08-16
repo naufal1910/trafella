@@ -59,6 +59,8 @@ VITE_MAP_TILES_URL="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
 VITE_GEOCODER_PROVIDER="nominatim"  # or "mock" for development
 ```
 
+- Nominatim requires no API key; this is suitable for staging smoke tests.
+
 By default, OSM tiles and Nominatim geocoding are used. The `mock` provider generates deterministic coordinates for testing without API calls.
 
 ### Compile and Hot-Reload for Development

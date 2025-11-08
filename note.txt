@@ -1,0 +1,44 @@
+
+curl -sSL https://raw.githubusercontent.com/buildermethods/agent-os/main/scripts/base-install.sh | bash
+
+/d/home/agent-os-main/scripts/project-install.sh --agent-os-commands true
+
+@1-product-concept.md
+i want to create ai itinerary builder saas
+
+gather the necessary information from you to create the product plan.
+Please provide the following to create your product plan:
+Main idea for the product
+List of key features (minimum 3)
+Target users and use cases (minimum 1)
+Will this product use your usual tech stack choices or deviate in any way?
+
+1. AI Itinerary builder web application saas
+2. Dynamic Itinerary Generation
+,Budget-Aware Planning
+,Pace-Based Scheduling
+,Traveler-Type Profiles
+,Drag-and-Drop Reordering
+3. The "Overwhelmed Organizer"
+
+Who they are: A busy parent planning the annual family vacation, or the one friend who always gets "volunteered" to plan the group trip. They are managing multiple (and often conflicting) needs.
+Main Use Case (Job-to-be-Done): "Help me plan a trip for 4+ people with different budgets, energy levels, and interests (e.g., kids, partner, friends). I need to balance everyone's needs and easily make adjustments when people change their minds, all without spending 20 hours researching."
+Why your features are perfect: Traveler-Type Profiles (for family/group) and Pace-Based Scheduling (managing kids' energy or a group's pace) are critical. Drag-and-Drop Reordering is essential for them to make constant adjustments based on group feedback.
+
+The "Budget-Conscious Explorer"
+
+Who they are: A solo backpacker, a recent graduate, or a young couple who loves to travel but must stick to a strict budget. They want the most experience for the least money.
+Main Use Case (Job-to-be-Done): "Help me build an amazing itinerary that respects my tight budget. I need to find the best value for activities and food, and I want to see how my choices impact my total spending in real-time."
+Why your features are perfect: Budget-Aware Planning is their number one priority. Pace-Based Scheduling allows them to pack their days with free/low-cost activities. Dynamic Itinerary Generation helps them discover things they might have missed.
+
+The "Time-Strapped Optimizer"
+
+Who they are: A busy professional, a "Type-A" planner, or someone on a short "bleisure" (business + leisure) trip. Their main constraint isn't money; it's time.
+Main Use Case (Job-to-be-Done): "I have exactly 72 hours in this city, and I want the perfectly optimized schedule. Help me create the most efficient plan that matches my specific interests and desired pace, ensuring I don't waste a single minute."
+Why your features are perfect: Pace-Based Scheduling (e.g., set to "Packed") is vital. Traveler-Type Profiles (e.g., "Solo," "Business") helps filter out irrelevant suggestions. Drag-and-Drop Reordering gives them the final feeling of control and optimization they crave.
+
+4. choose the most recommended
+
+@2-create-mission.md
+@3-create-roadmap.md
+@4-create-tech-stack.md

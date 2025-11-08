@@ -1,0 +1,24 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Poi {
+  id          String  @id @default(cuid())
+  name        String
+  category    String
+  description String
+  lat         Float
+  lng         Float
+  location    String
+  destination String
+
+  @@index([destination])
+  @@index([category])
+  @@index([location])
+  @@index([lat, lng])
+}

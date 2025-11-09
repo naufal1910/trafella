@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const { normalize } = require('../lib/validation/itinerarySchema');
 const { getPoisByDestinationAndInterests } = require('../lib/db/poi');
 const cache = require('../lib/cache/redis');
+const logger = require('../lib/log/logger');
 const { haversineKm } = require('../lib/geo/distance');
 
 function hashInput(input) {
@@ -50,11 +51,13 @@ function clusterIntoDaysByProximity(pois, daysCount, capPerDay = 7, startDateStr
 }
 
 async function generateItinerary(rawInput) {
+  const t0 = Date.now();
   // Validate and normalize
   let normalized;
   try {
     normalized = normalize(rawInput);
   } catch (e) {
+    logger.warn('itinerary.invalid_input', { details: e.message });
     const err = new Error('Invalid input');
     err.status = 400;
     err.details = e.message;
@@ -67,12 +70,17 @@ async function generateItinerary(rawInput) {
   // Cache lookup
   const hash = hashInput({ destination, interests, startDate, daysCount, budget: normalized.budget, partySize: normalized.partySize });
   const cacheKey = `itinerary:${hash}`;
+  logger.debug('cache.lookup', { cacheKey, hash, destination, daysCount, interestsCount: (interests || []).length });
   const cached = await cache.get(cacheKey);
-  if (cached) return cached;
+  if (cached) {
+    logger.info('cache.hit', { cacheKey });
+    return cached;
+  }
 
   // Fetch POIs
   const pois = await getPoisByDestinationAndInterests({ destination, interests });
   if (!pois || pois.length === 0) {
+    logger.warn('pois.empty', { destination, interestsCount: (interests || []).length });
     const err = new Error('Unknown destination or no POIs found');
     err.status = 404;
     err.code = 'NOT_FOUND';
@@ -85,11 +93,16 @@ async function generateItinerary(rawInput) {
   const days = clusterIntoDaysByProximity(pois, daysCount, cap, startDate);
 
   const response = { days };
+  const totalItems = days.reduce((acc, d) => acc + (d.items?.length || 0), 0);
+  logger.info('itinerary.generate.ok', { destination, days: days.length, totalItems });
 
   // Cache result
   const ttl = Number(process.env.CACHE_TTL_SECONDS || 3600);
   await cache.set(cacheKey, response, ttl);
+  logger.debug('cache.set', { cacheKey, ttl });
 
+  const durationMs = Date.now() - t0;
+  logger.info('itinerary.done', { durationMs });
   return response;
 }
 
